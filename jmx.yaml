@@ -20,5 +20,5 @@ init_config:
 
 instances:
   - name: kafka_connect_jmx_metrics
-    host: cp-kafka-connect-test-new-2-dc-evst-nonprod.apps.dn01.exxonmobil.com
+    host: https://cp-kafka-connect-test-new-2-dc-evst-nonprod.apps.dn01.exxonmobil.com
     port: 443
