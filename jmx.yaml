@@ -1,1 +1,24 @@
+init_config:
+  is_jmx: true
+  conf:
+    - include:
+        bean: kafka.connect:type=app-info,client-id=*
+    - include:
+        bean: kafka.connect:type=connect-coordinator-metrics,*
+    - include:
+        bean: kafka.connect:type=connect-metrics,*
+    - include:
+        bean: kafka.connect:type=connect-worker-metrics
+    - include:
+        bean: kafka.connect:type=connect-worker-metrics,*
+    - include:
+        bean: kafka.connect:type=connector-metrics,*
+    - include:
+        bean: kafka.connect:type=*-task-metrics,*
+    - include:
+        bean: kafka.connect:type=task-error-metrics,*
 
+instances:
+  - name: kafka_connect_jmx_metrics
+    host: cp-kafka-connect-test-new-2-dc-evst-nonprod.apps.dn01.exxonmobil.com
+    port: 443
