@@ -1,6 +1,5 @@
 instances:
   # The prometheus endpoint to query from
-  - prometheus_url: https://cp-kafka-connect-test-new-2-dc-evst-nonprod.apps.dn01.exxonmobil.com/metrics
+  - openmetrics_endpoint: https://cp-kafka-connect-test-new-2-dc-evst-nonprod.apps.dn01.exxonmobil.com/metrics
     namespace: "myapp"
-    metrics:
-      - kafka_connect*
+    metrics: [{"^kafka_connect_.+": {"type": "gauge"}}, ".+"]
