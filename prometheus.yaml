@@ -3,4 +3,4 @@ instances:
   - prometheus_url: https://cp-kafka-connect-test-new-2-dc-evst-nonprod.apps.dn01.exxonmobil.com/metrics
     namespace: "myapp"
     metrics:
-      - kafka*
+      - kafka_connect*
