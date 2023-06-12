@@ -1,24 +1,389 @@
 init_config:
   is_jmx: true
   conf:
+    # Kafka Connect Metrics
+    # https://kafka.apache.org/documentation/#connect_monitoring
     - include:
-        bean: kafka.connect:type=app-info,client-id=*
-    - include:
-        bean: kafka.connect:type=connect-coordinator-metrics,*
-    - include:
-        bean: kafka.connect:type=connect-metrics,*
-    - include:
+        domain: kafka.connect
         bean: kafka.connect:type=connect-worker-metrics
+        attribute:
+          connector-count:
+            # The number of connectors run in this worker.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          connector-startup-attempts-total:
+            # The total number of connector startups that this worker has attempted.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          connector-startup-failure-percentage:
+            # The average percentage of this worker's connectors starts that failed.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          connector-startup-failure-total:
+            # The total number of connector starts that failed.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          connector-startup-success-percentage:
+            # The average percentage of this worker's connectors starts that succeeded.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          connector-startup-success-total:
+            # The total number of connector starts that succeeded.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          task-count:
+            # The number of tasks run in this worker.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          task-startup-attempts-total:
+            # The total number of task startups that this worker has attempted.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          task-startup-failure-percentage:
+            # The average percentage of this worker's tasks starts that failed.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          task-startup-failure-total:
+            # The total number of task starts that failed.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          task-startup-success-percentage:
+            # The average percentage of this worker's tasks starts that succeeded.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          task-startup-success-total:
+            # The total number of task starts that succeeded.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+
+
+    # Kafka Connect Metrics
+    # https://kafka.apache.org/documentation/#connect_monitoring
     - include:
-        bean: kafka.connect:type=connect-worker-metrics,*
+        domain: kafka.connect
+        bean_regex:
+          - kafka\.connect:type=connect-metrics,client-id=.*
+        attribute:
+          outgoing-byte-rate: 
+            # Rate of outgoing bytes
+            alias: confluent.$domain.connect_metrics.outgoing_byte_rate
+          incoming-byte-rate:
+            # Rate of incoming bytes
+            alias: confluent.$domain.connect_metrics.incoming_byte_rate
+          failed-authentication-rate:
+            # Rate of failed authentications
+            alias: confluent.$domain.connect_metrics.failed_authentication_rate
+          successful-authentication-rate:
+            # Rate of successful authentication
+            alias: confluent.$domain.connect_metrics.successful_authentication_rate
+          failed-authentication-total:
+            # Total amount of failed authentications
+            alias: confluent.$domain.connect_metrics.failed_authentication_total
+          successful-authentication-total:
+            # Total amount of failed authentications
+            alias: confluent.$domain.connect_metrics.successful_authentication_total
+
+    # Kafka Connect Metrics
+    # https://kafka.apache.org/documentation/#connect_monitoring
     - include:
-        bean: kafka.connect:type=connector-metrics,*
+        domain: kafka.connect
+        bean_regex:
+          - kafka\.connect:type=connector-metrics,connector=.*
+        tags:
+          connector: $0
+        attribute:
+          status:
+            # Status of the connector (string)
+            metric_type: gauge
+            alias: confluent.$domain.connector_metrics.status
+            values:
+                  "unassigned": 0
+                  "running": 1
+                  "paused": 2
+                  "falied": 3
+                  "destroyed": 4
+
+    # Kafka Connect Metrics
+    # https://kafka.apache.org/documentation/#connect_monitoring
     - include:
-        bean: kafka.connect:type=*-task-metrics,*
+        domain: kafka.connect
+        bean_regex:
+          # The bean should `connect-worker-metrics` but in practice the type is `connector-metrics`
+          # We are supporting both while the issue is solved: https://issues.apache.org/jira/browse/KAFKA-9790
+          # Issue above is solved. Leaving for backwards compatibility.
+          - kafka\.connect:type=connect-worker-metrics,connector=.*
+          - kafka\.connect:type=connector-metrics,connector=.*
+        attribute:
+          connector-destroyed-task-count:
+            # The number of destroyed tasks of the connector on the worker.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          connector-failed-task-count:
+            # The number of failed tasks of the connector on the worker.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          connector-paused-task-count:
+            # The number of paused tasks of the connector on the worker.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          connector-running-task-count:
+            # The number of running tasks of the connector on the worker.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          connector-total-task-count:
+            # The number of tasks of the connector on the worker.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+          connector-unassigned-task-count:
+            # The number of unassigned tasks of the connector on the worker.
+            alias: confluent.$domain.worker.$attribute
+            metric_type: gauge
+
+    # Kafka Connect Metrics
+    # https://kafka.apache.org/documentation/#connect_monitoring
     - include:
-        bean: kafka.connect:type=task-error-metrics,*
+        domain: kafka.connect
+        bean: kafka.connect:type=connect-worker-rebalance-metrics
+        attribute:
+          completed-rebalances-total:
+            # The total number of rebalances completed by this worker.
+            alias: confluent.$domain.worker_rebalance.$attribute
+            metric_type: gauge
+          epoch:
+            # The epoch or generation number of this worker.
+            alias: confluent.$domain.worker_rebalance.$attribute
+            metric_type: gauge
+          rebalance-avg-time-ms:
+            # The average time in milliseconds spent by this worker to rebalance.
+            alias: confluent.$domain.worker_rebalance.$attribute
+            metric_type: gauge
+          rebalance-max-time-ms:
+            # The maximum time in milliseconds spent by this worker to rebalance.
+            alias: confluent.$domain.worker_rebalance.$attribute
+            metric_type: gauge
+          rebalancing:
+            # Whether this worker is currently rebalancing.
+            alias: confluent.$domain.worker_rebalance.$attribute
+            metric_type: gauge
+          time-since-last-rebalance-ms:
+            # The time in milliseconds since this worker completed the most recent rebalance.
+            alias: confluent.$domain.worker_rebalance.$attribute
+            metric_type: gauge
+
+    # Kafka Connect Task Metrics
+    # https://kafka.apache.org/documentation/#connect_monitoring
+    - include:
+        domain: kafka.connect
+        bean_regex: kafka\.connect:type=connector-task-metrics,connector=.*,task=.*
+        attribute:
+          batch-size-avg:
+            # The average size of the batches processed by the connector.
+            alias: confluent.$domain.connector_task.$attribute
+            metric_type: gauge
+          batch-size-max:
+            # The maximum size of the batches processed by the connector.
+            alias: confluent.$domain.connector_task.$attribute
+            metric_type: gauge
+          offset-commit-avg-time-ms:
+            # The average time in milliseconds taken by this task to commit offsets.
+            alias: confluent.$domain.connector_task.$attribute
+            metric_type: gauge
+          offset-commit-failure-percentage:
+            # The average percentage of this task's offset commit attempts that failed.
+            alias: confluent.$domain.connector_task.$attribute
+            metric_type: gauge
+          offset-commit-max-time-ms:
+            # The maximum time in milliseconds taken by this task to commit offsets.
+            alias: confluent.$domain.connector_task.$attribute
+            metric_type: gauge
+          offset-commit-success-percentage:
+            # The average percentage of this task's offset commit attempts that succeeded.
+            alias: confluent.$domain.connector_task.$attribute
+            metric_type: gauge
+          pause-ratio:
+            # The fraction of time this task has spent in the pause state.
+            alias: confluent.$domain.connector_task.$attribute
+            metric_type: gauge
+          running-ratio:
+            # The fraction of time this task has spent in the running state.
+            alias: confluent.$domain.connector_task.$attribute
+            metric_type: gauge
+
+    # Kafka Connect Sink Metrics
+    # https://kafka.apache.org/documentation/#connect_monitoring
+    - include:
+        domain: kafka.connect
+        bean_regex: kafka\.connect:type=sink-task-metrics,connector=.*,task=.*
+        attribute:
+          offset-commit-completion-rate:
+            # The average per-second number of offset commit completions that were completed successfully.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          offset-commit-completion-total:
+            # The total number of offset commit completions that were completed successfully.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          offset-commit-seq-no:
+            # The current sequence number for offset commits.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          offset-commit-skip-rate:
+            # The average per-second number of offset commit completions that were received too late and skipped/ignored.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          offset-commit-skip-total:
+            # The total number of offset commit completions that were received too late and skipped/ignored.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          partition-count:
+            # The number of topic partitions assigned to this task belonging to the named sink connector in this worker.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          put-batch-avg-time-ms:
+            # The average time taken by this task to put a batch of sinks records.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          put-batch-max-time-ms:
+            # The maximum time taken by this task to put a batch of sinks records.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          sink-record-active-count:
+            # The number of records that have been read from Kafka but not yet completely committed/flushed/acknowledged by the sink task.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          sink-record-active-count-avg:
+            # The average number of records that have been read from Kafka but not yet completely committed/flushed/acknowledged by the sink task.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          sink-record-active-count-max:
+            # The maximum number of records that have been read from Kafka but not yet completely committed/flushed/acknowledged by the sink task.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          sink-record-lag-max:
+            # The maximum lag in terms of number of records that the sink task is behind the consumer's position for any topic partitions.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          sink-record-read-rate:
+            # The average per-second number of records read from Kafka for this task belonging to the named sink connector in this worker. This is before transformations are applied.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          sink-record-read-total:
+            # The total number of records read from Kafka by this task belonging to the named sink connector in this worker, since the task was last restarted.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          sink-record-send-rate:
+            # The average per-second number of records output from the transformations and sent/put to this task belonging to the named sink connector in this worker. This is after transformations are applied and excludes any records filtered out by the transformations.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+          sink-record-send-total:
+            # The total number of records output from the transformations and sent/put to this task belonging to the named sink connector in this worker, since the task was last restarted.
+            alias: confluent.$domain.sink_task.$attribute
+            metric_type: gauge
+
+    # Kafka Connect Source Tasks Metrics
+    # https://kafka.apache.org/documentation/#connect_monitoring
+    - include:
+        domain: kafka.connect
+        bean_regex: kafka\.connect:type=source-task-metrics,connector=.*,task=.*
+        attribute:
+          poll-batch-avg-time-ms:
+            # The average time in milliseconds taken by this task to poll for a batch of source records.
+            alias: confluent.$domain.source_task.$attribute
+            metric_type: gauge
+          poll-batch-max-time-ms:
+            # The maximum time in milliseconds taken by this task to poll for a batch of source records.
+            alias: confluent.$domain.source_task.$attribute
+            metric_type: gauge
+          source-record-active-count:
+            # The number of records that have been produced by this task but not yet completely written to Kafka.
+            alias: confluent.$domain.source_task.$attribute
+            metric_type: gauge
+          source-record-active-count-avg:
+            # The average number of records that have been produced by this task but not yet completely written to Kafka.
+            alias: confluent.$domain.source_task.$attribute
+            metric_type: gauge
+          source-record-active-count-max:
+            # The maximum number of records that have been produced by this task but not yet completely written to Kafka.
+            alias: confluent.$domain.source_task.$attribute
+            metric_type: gauge
+          source-record-poll-rate:
+            # The average per-second number of records produced/polled (before transformation) by this task belonging to the named source connector in this worker.
+            alias: confluent.$domain.source_task.$attribute
+            metric_type: gauge
+          source-record-poll-total:
+            # The total number of records produced/polled (before transformation) by this task belonging to the named source connector in this worker.
+            alias: confluent.$domain.source_task.$attribute
+            metric_type: gauge
+          source-record-write-rate:
+            # The average per-second number of records output from the transformations and written to Kafka for this task belonging to the named source connector in this worker. This is after transformations are applied and excludes any records filtered out by the transformations.
+            alias: confluent.$domain.source_task.$attribute
+            metric_type: gauge
+          source-record-write-total:
+            # The number of records output from the transformations and written to Kafka for this task belonging to the named source connector in this worker, since the task was last restarted.
+            alias: confluent.$domain.source_task.$attribute
+            metric_type: gauge
+
+    # Kafka Connect Task Error Metrics
+    # https://kafka.apache.org/documentation/#connect_monitoring
+    - include:
+        domain: kafka.connect
+        bean_regex: kafka\.connect:type=task-error-metrics,connector=.*,task=.*
+        attribute:
+          deadletterqueue-produce-failures:
+            # The number of failed writes to the dead letter queue.
+            alias: confluent.$domain.task_error.$attribute
+            metric_type: gauge
+          deadletterqueue-produce-requests:
+            # The number of attempted writes to the dead letter queue.
+            alias: confluent.$domain.task_error.$attribute
+            metric_type: gauge
+          last-error-timestamp:
+            # The epoch timestamp when this task last encountered an error.
+            alias: confluent.$domain.task_error.$attribute
+            metric_type: gauge
+          total-errors-logged:
+            # The number of errors that were logged.
+            alias: confluent.$domain.task_error.$attribute
+            metric_type: gauge
+          total-record-errors:
+            # The number of record processing errors in this task.
+            alias: confluent.$domain.task_error.$attribute
+            metric_type: gauge
+          total-record-failures:
+            # The number of record processing failures in this task.
+            alias: confluent.$domain.task_error.$attribute
+            metric_type: gauge
+          total-records-skipped:
+            # The number of records skipped due to errors.
+            alias: confluent.$domain.task_error.$attribute
+            metric_type: gauge
+          total-retries:
+            # The number of operations retried.
+            alias: confluent.$domain.task_error.$attribute
+            metric_type: gauge
+
+    # Components Metrics:
+    #   - Kafka REST: https://docs.confluent.io/current/kafka-rest/monitoring.html
+    #   - Kafka Schema Registry: https://docs.confluent.io/current/schema-registry/monitoring.html
+    - include:
+        bean:
+          - kafka.rest:type=jetty-metrics
+          - kafka.schema.registry:type=jetty-metrics
+        attribute:
+          connections-active:
+            # Total number of active TCP connections.
+            alias: confluent.$domain.jetty.$attribute
+            metric_type: gauge
+          connections-opened-rate:
+            # The average rate per second of opened TCP connections.
+            alias: confluent.$domain.jetty.$attribute
+            metric_type: gauge
+          connections-closed-rate:
+            # The average rate per second of closed TCP connections.
+            alias: confluent.$domain.jetty.$attribute
+            metric_type: gauge
 
 instances:
   - name: kafka_connect_jmx_metrics
-    host: cp-kafka-connect-test-new-3-dc-evst-nonprod.apps.dn01.exxonmobil.com
-    port: 443
+    host: cp-kafka-connect-test-new
+    port: 1099
