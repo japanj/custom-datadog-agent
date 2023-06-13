@@ -1,3 +1,6 @@
+init_config:
+ is_jmx: true
+ service_check_prefix: confluent
 instances:
  - host: cp-kafka-connect-test-new-dc-evst-nonprod.apps.dn01.exxonmobil.com
    port: 443
