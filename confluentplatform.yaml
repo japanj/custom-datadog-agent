@@ -1,0 +1,4 @@
+instances:
+ - host: cp-kafka-connect-test-new-dc-evst-nonprod.apps.dn01.exxonmobil.com
+   port: 443
+   name: kafka_connect
