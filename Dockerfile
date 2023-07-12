@@ -1,5 +1,5 @@
 # FROM datadog/agent:7.27.0-jmx
-FROM gcr.io/datadoghq/agent:latest-jmx
+FROM gcr.io/datadoghq/agent:7.46.0-jmx
 
 # Transfer the JMX integration configuration file to jmx.d
 # RUN curl https://raw.githubusercontent.com/japanj/custom-datadog-agent/main/jmx.yaml -o jmx.yaml
